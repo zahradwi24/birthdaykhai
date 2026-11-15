@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY BIRTHDAY KHAI | Birthday Edition ✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-wall: #f9eef2;
+            --pastel-pink: #f8dce0;
+            --pastel-blue: #dce8f5;
+            --pastel-yellow: #fdf0c9;
+            --pastel-purple: #e6dff5;
+            --pastel-mint: #dcf5e8;
+            --ink: #2d2628;
+            --muted: #6e6266;
+            --rose: #e06d83;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background-color: var(--bg-wall);
+            background-image: radial-gradient(#e6c8d2 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--ink);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LOCK SCREEN */
+        #lockScreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple), var(--pastel-blue));
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #lockScreen.unlocked { opacity: 0; pointer-events: none; transform: scale(1.06); }
+
+        .lock-box {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            padding: 30px 26px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 330px;
+            width: 100%;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.08);
+            border: 2px solid #fff;
+        }
+        .lock-box img {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--pastel-pink); margin-bottom: 10px;
+        }
+        .lock-box h2 { font-family: 'Fredoka', sans-serif; font-size: 22px; margin-bottom: 4px; }
+        .pin-dots { display: flex; justify-content: center; gap: 10px; margin: 16px 0 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--rose); transition: 0.2s; }
+        .dot.filled { background: var(--rose); transform: scale(1.2); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 220px; margin: 0 auto; }
+        .key {
+            background: #fff; border: none; height: 50px; border-radius: 50%;
+            font-family: 'Fredoka', sans-serif; font-size: 18px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.15s;
+        }
+        .key:active { transform: scale(0.9); background: var(--pastel-pink); }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+        /* TOP STATUS BAR */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            z-index: 50;
+        }
+
+        .status-badges { display: flex; gap: 10px; align-items: center; }
+        .pill {
+            background: var(--pastel-yellow);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 11.5px;
+        }
+
+        /* DESKTOP AREA */
+        .desktop-area {
+            flex: 1;
+            position: relative;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 310px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        /* APP ICONS GRID */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+            gap: 20px;
+            align-content: start;
+            padding-top: 10px;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 12px 8px;
+            border-radius: 20px;
+            transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .app-icon:hover {
+            transform: translateY(-6px) scale(1.05);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .app-icon:active { transform: scale(0.94); }
+
+        .icon-box {
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border: 2px solid #fff;
+            position: relative;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--rose);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+        .app-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            text-align: center;
+            background: rgba(255,255,255,0.75);
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        /* WIDGETS KANAN */
+        .widgets-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .widget {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 2px solid #fff;
+        }
+
+        .widget-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* MINI PHOTO WIDGET */
+        .mini-polaroid {
+            background: #fff;
+            padding: 8px 8px 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .mini-polaroid:hover { transform: rotate(-2deg) scale(1.02); }
+        .mini-polaroid img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
+        .mini-polaroid span { font-family: 'Caveat', cursive; font-size: 20px; color: var(--rose); display: block; margin-top: 4px; }
+
+        /* INTERACTIVE STICKER / MOOD BUTTONS */
+        .mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .mood-btn {
+            background: var(--bg-wall); border: none; padding: 10px 0; border-radius: 14px;
+            font-size: 20px; cursor: pointer; transition: 0.2s;
+        }
+        .mood-btn:hover { background: var(--pastel-pink); transform: scale(1.1); }
+
+        /* POPUP WINDOWS (MODAL APLIKASI) */
+        .window-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 92%;
+            max-width: 540px;
+            max-height: 85vh;
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            border: 3px solid var(--pastel-pink);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transition: 0.25s ease;
+        }
+
+        .window-modal.open {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .win-header {
+            background: var(--pastel-pink);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 17px;
+        }
+
+        .win-close {
+            background: #fff;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--rose);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .win-body {
+            padding: 22px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* APP 1: GALLERY DECK (13 FOTO) */
+        .photo-stage {
+            text-align: center;
+        }
+        .flip-card {
+            background: var(--bg-wall);
+            border-radius: 20px;
+            padding: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px dashed var(--rose);
+        }
+        .flip-card img {
+            width: 100%;
+            height: 290px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+        .photo-caption {
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+            color: var(--rose);
+            margin-top: 10px;
+        }
+        .deck-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            gap: 10px;
+        }
+        .btn-pill {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 99px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-pill:hover { background: var(--rose); }
+
+        .thumb-strip {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 12px 2px 4px;
+            margin-top: 10px;
+        }
+        .thumb-strip img {
+            width: 46px;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            opacity: 0.55;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+        }
+        .thumb-strip img.active {
+            opacity: 1;
+            border-color: var(--rose);
+            transform: scale(1.08);
+        }
+
+        /* APP 2: SELANGOR - BATAM RADAR */
+        .radar-box {
+            background: var(--pastel-blue);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+        .route-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 18px 0;
+        }
+        .city-badge img {
+            width: 68px; height: 68px; border-radius: 50%; object-fit: cover;
+            border: 3px solid #fff;
+        }
+        .track-line {
+            flex: 1;
+            border-bottom: 3px dashed var(--rose);
+            margin: 0 12px;
+            position: relative;
+            height: 24px;
+        }
+        .plane-anim {
+            position: absolute;
+            top: -4px;
+            font-size: 22px;
+            animation: flyRoute 3.5s infinite alternate ease-in-out;
+        }
+        @keyframes flyRoute { 0%{left:5%} 100%{left:80%} }
+
+        .love-meter-bar {
+            width: 100%;
+            height: 18px;
+            background: #fff;
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 12px 0;
+            padding: 3px;
+        }
+        .love-fill {
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, var(--pastel-pink), var(--rose));
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        /* APP 3: SECRET LETTERS */
+        .mail-item {
+            background: var(--bg-wall);
+            padding: 14px 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: 0.2s;
+        }
+        .mail-item:hover { border-color: var(--rose); background: var(--pastel-yellow); }
+        .mail-content {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        /* APP 4: GAMES & GACHA */
+        #catchArena {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(180deg, var(--pastel-purple), var(--pastel-pink));
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 10px 0;
+            cursor: ew-resize;
+        }
+        #basket { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 32px; }
+        .falling { position: absolute; top: -25px; font-size: 22px; }
+
+        .gacha-box {
+            background: var(--pastel-yellow);
+            padding: 16px;
+            border-radius: 18px;
+            text-align: center;
+            margin-top: 16px;
+        }
+        .gacha-result {
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 17px;
+            color: var(--rose);
+            margin: 10px 0;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* BOTTOM DOCK */
+        .bottom-dock {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            z-index: 50;
+        }
+
+        .dock-btn {
+            background: var(--pastel-pink);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .dock-btn:hover { transform: translateY(-3px); background: var(--rose); color: #fff; }
+
+        #confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 1500; }
+
+        @media (max-width: 740px) {
+            .desktop-area { grid-template-columns: 1fr; }
+            .widgets-col { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+    <div class="lock-box" id="lockBox">
+        <img src="poto1.jpeg" alt="Avatar">
+        <h2>Selangor — Batam OS</h2>
+        <p style="font-size: 12px; color: var(--muted);">Masukkan 6 digit tanggal spesial</p>
+        <div class="pin-dots" id="pinDots">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="keypad">
+            <button class="key" onclick="pressPin('1')">1</button>
+            <button class="key" onclick="pressPin('2')">2</button>
+            <button class="key" onclick="pressPin('3')">3</button>
+            <button class="key" onclick="pressPin('4')">4</button>
+            <button class="key" onclick="pressPin('5')">5</button>
+            <button class="key" onclick="pressPin('6')">6</button>
+            <button class="key" onclick="pressPin('7')">7</button>
+            <button class="key" onclick="pressPin('8')">8</button>
+            <button class="key" onclick="pressPin('9')">9</button>
+            <button class="key" style="font-size:12px" onclick="clearPin()">Hapus</button>
+            <button class="key" onclick="pressPin('0')">0</button>
+            <button class="key" style="font-size:14px" onclick="backPin()">⌫</button>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+    <source src="lagu.mp3" type="audio/mpeg">
+</audio>
+
+<!-- TOP STATUS BAR -->
+<div class="top-bar">
+    <div>🌸 Happy Birthday OS</div>
+    <div class="status-badges">
+        <span class="pill">🇲🇾 Selangor ↔ Batam 🇮🇩</span>
+        <span id="clockText">12:00</span>
+    </div>
+</div>
+
+<!-- DESKTOP WORKSPACE -->
+<div class="desktop-area">
+    <!-- IKON-IKON YANG BISA DIKLIK -->
+    <div class="apps-grid">
+        <div class="app-icon" onclick="openApp('appGallery')">
+            <div class="icon-box" style="background: var(--pastel-pink);">
+                📸
+                <span class="notif-badge">13</span>
+            </div>
+            <span class="app-label">13 Kenangan</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('appRadar')">
+            <div class="icon-box" style="background: var(--pastel-blue);">
+                ✈️
+                <span class="notif-badge">!</span>
+            </div>
+            <span class="app-label">Selangor-Batam</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('appMail')">
+            <div class="icon-box" style="background: var(--pastel-yellow);">
+                💌
+                <span class="notif-badge">3</span>
+            </div>
+            <span class="app-label">Surat Rahasia</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('appGames')">
+            <div class="icon-box" style="background: var(--pastel-purple);">
+                🎮
+            </div>
+            <span class="app-label">Mini Games</span>
+        </div>
+
+        <div class="app-icon" onclick="openApp('appCake')">
+            <div class="icon-box" style="background: var(--pastel-mint);">
+                🎂
+            </div>
+            <span class="app-label">Tiup Lilin</span>
+        </div>
+
+        <div class="app-icon" onclick="spawnFloatingEmoji('❤️')">
+            <div class="icon-box" style="background: #ffe3e8;">
+                💖
+            </div>
+            <span class="app-label">TAP</span>
+        </div>
+    </div>
+
+    <!-- WIDGET KANAN -->
+    <div class="widgets-col">
+        <div class="widget">
+            <div class="widget-title">
+                <span>📌 Featured Memory</span>
+                <span style="font-size: 11px; color: var(--rose);">Klik foto</span>
+            </div>
+            <div class="mini-polaroid" onclick="openApp('appGallery')">
+                <img src="poto2.jpeg" alt="Featured">
+                <span>My Favorite Person ✨</span>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">
+                <span>✨ Kirim Reaksi Cepat</span>
+            </div>
+            <div class="mood-grid">
+                <button class="mood-btn" onclick="spawnFloatingEmoji('🥰')">🥰</button>
+                <button class="mood-btn" onclick="spawnFloatingEmoji('🤗')">🤗</button>
+                <button class="mood-btn" onclick="spawnFloatingEmoji('🎉')">🎉</button>
+                <button class="mood-btn" onclick="spawnFloatingEmoji('🍓')">🍓</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM DOCK -->
+<div class="bottom-dock">
+    <button class="dock-btn" onclick="openApp('appGallery')">📸 Galeri (13)</button>
+    <button class="dock-btn" onclick="openApp('appGames')">🎮 Main Game</button>
+    <button class="dock-btn" onclick="toggleMusic()" id="musicBtn">🎵 Play Lagu</button>
+</div>
+
+<!-- ================= WINDOW 1: GALERI 13 FOTO ================= -->
+<div class="window-modal" id="appGallery">
+    <div class="win-header">
+        <span>📸 Galeri 13 Foto Kita (<span id="photoCounter">1 / 13</span>)</span>
+        <button class="win-close" onclick="closeApp('appGallery')">✕</button>
+    </div>
+    <div class="win-body photo-stage">
+        <div class="flip-card" onclick="nextPhoto()">
+            <img id="currentPhotoImg" src="poto2.jpeg" alt="Foto">
+            <div class="photo-caption" id="currentPhotoCap">Chapter 1: Awal cerita favoritku ✨ ✨</div>
+        </div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">Klik foto atau tombol di bawah untuk ganti foto</p>
+
+        <div class="deck-controls">
+            <button class="btn-pill" onclick="prevPhoto()">◀ Prev</button>
+            <button class="btn-pill" style="background: var(--rose);" onclick="spawnFloatingEmoji('❤️')">❤️ Suka Foto Ini</button>
+            <button class="btn-pill" onclick="nextPhoto()">Next ▶</button>
+        </div>
+
+        <!-- Thumbnail 13 Foto -->
+        <div class="thumb-strip" id="thumbStrip"></div>
+    </div>
+</div>
+
+<!-- ================= WINDOW 2: SELANGOR - BATAM ================= -->
+<div class="window-modal" id="appRadar">
+    <div class="win-header" style="background: var(--pastel-blue);">
+        <span>✈️ Radar Jarak: Selangor — Batam</span>
+        <button class="win-close" onclick="closeApp('appRadar')">✕</button>
+    </div>
+    <div class="win-body">
+        <div class="radar-box">
+            <p style="font-size: 13px; font-weight: 700;">STATUS: LINTAS SELAT MALAKA (~300 KM)</p>
+            <div class="route-row">
+                <div class="city-badge">
+                    <img src="poto4.jpeg" alt="Selangor">
+                    <div style="font-weight:700; margin-top:4px;">Selangor 🇲🇾</div>
+                </div>
+                <div class="track-line">
+                    <span class="plane-anim">✈️</span>
+                </div>
+                <div class="city-badge">
+                    <img src="poto5.jpeg" alt="Batam">
+                    <div style="font-weight:700; margin-top:4px;">Batam 🇮🇩</div>
+                </div>
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.6;">
+                Walaupun dipisahkan laut dan beda negara, sinyal kangen dari Batam ke Selangor selalu <i>full bar</i>!
+            </p>
+        </div>
+
+        <div style="margin-top: 18px; text-align: center;">
+            <p style="font-weight: 700; font-size: 14px;">Klik tombol di bawah untuk isi penuh Love Meter:</p>
+            <div class="love-meter-bar">
+                <div class="love-fill" id="loveFill"></div>
+            </div>
+            <button class="btn-pill" style="background: var(--rose); width: 100%;" onclick="boostLove()">
+                🤗 Klik Berkali-kali Kirim Pelukan (<span id="lovePercent">40%</span>)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= WINDOW 3: SURAT RAHASIA ================= -->
+<div class="window-modal" id="appMail">
+    <div class="win-header" style="background: var(--pastel-yellow);">
+        <span>💌 Kotak Masuk Ucapan (Klik untuk buka)</span>
+        <button class="win-close" onclick="closeApp('appMail')">✕</button>
+    </div>
+    <div class="win-body">
+        <div class="mail-item" onclick="toggleMail(this)">
+            <strong>📩 Pesan #1: Selamat Bertambah Usia!</strong>
+            <div class="mail-content">
+                Selamat ulang tahun, Khai! Terima kasih sudah lahir ke dunia dan jadi bagian cerita indah di hidupku. Semoga semua impian yang lagi kamu perjuangkan tahun ini dimudahkan jalannya ya!
+            </div>
+        </div>
+
+        <div class="mail-item" onclick="toggleMail(this)">
+            <strong>📩 Pesan #2: Terimakasii</strong>
+            <div class="mail-content">
+                Makasii ya udah selalu sabar dengan aku walaupun aku selalu ngambek dan marah" sama kamu, tapi kamu selalu minta maaf ke akuu dan sabarr 
+            </div>
+        </div>
+
+        <div class="mail-item" onclick="toggleMail(this)">
+            <strong>📩 Pesan #3: Doa Terbaik Buat Kamu</strong>
+            <div class="mail-content">
+                Sehat selalu, bahagia terus, jangan sering-sering begadang, dan semoga rasa cape kerja kamu terbayarkan dengan kamu jadi orang sukses dimasa depan yaa!!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= WINDOW 4: MINI GAMES & GACHA ================= -->
+<div class="window-modal" id="appGames">
+    <div class="win-header" style="background: var(--pastel-purple);">
+        <span>🎮 Mini Arcade & Gacha Hadiah</span>
+        <button class="win-close" onclick="closeApp('appGames')">✕</button>
+    </div>
+    <div class="win-body">
+        <!-- Game 1: Tangkap Hati -->
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px;">
+            <span>1. Tangkap Kiriman Hati</span>
+            <span>Skor: <span id="scoreVal">0</span> | Waktu: <span id="timeVal">15</span>d</span>
+        </div>
+        <div id="catchArena">
+            <div id="basket">🧺</div>
+        </div>
+        <button class="btn-pill" style="width:100%;" id="startBtn" onclick="startCatch()">Mulai Tangkap Hati ❤️</button>
+
+        <!-- Game 2: Gacha Voucher -->
+        <div class="gacha-box">
+            <strong>🎁 2. Gacha Voucher Voucher Hadiah!</strong>
+            <p style="font-size: 12px; color: var(--muted);">Klik tombol acak buat dapetin hadiah kencan</p>
+            <div class="gacha-result" id="gachaText">❓ Klik tombol di bawah!</div>
+            <button class="btn-pill" style="background: var(--rose);" onclick="spinGacha()">🎲 Putar Gacha Sekarang</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= WINDOW 5: TIUP LILIN ================= -->
+<div class="window-modal" id="appCake">
+    <div class="win-header" style="background: var(--pastel-mint);">
+        <span>🎂 Make A Wish!</span>
+        <button class="win-close" onclick="closeApp('appCake')">✕</button>
+    </div>
+    <div class="win-body" style="text-align: center; padding: 30px 20px;">
+        <p style="font-size: 15px; margin-bottom: 12px;" id="cakeHint">Tutup mata, ucapkan harapanmu, lalu klik kuenya!</p>
+        <div style="font-size: 90px; cursor: pointer; position: relative; display: inline-block;" onclick="blowCake()">
+            <span id="flameIcon" style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:36px;">🔥</span>
+            🎂
+        </div>
+        <p id="wishDone" style="display:none; font-family:'Caveat',cursive; font-size:30px; color:var(--rose); margin-top:15px;">
+            Yeay! Semoga semua harapanmu terkabul tahun ini 🎉✨
+        </p>
+    </div>
+</div>
+
+<script>
+    // 1. LOCK SCREEN PIN (Ubah PIN di sini)
+    const PIN = "161106";
+    let inputPin = "";
+
+    function pressPin(n) {
+        if (inputPin.length < 6) {
+            inputPin += n;
+            renderDots();
+            if (inputPin.length === 6) setTimeout(checkPin, 200);
+        }
+    }
+    function backPin() { inputPin = inputPin.slice(0, -1); renderDots(); }
+    function clearPin() { inputPin = ""; renderDots(); }
+    function renderDots() {
+        document.querySelectorAll('#pinDots .dot').forEach((d, i) => d.classList.toggle('filled', i < inputPin.length));
+    }
+    function checkPin() {
+        if (inputPin === PIN) {
+            document.getElementById('lockScreen').classList.add('unlocked');
+            launchConfetti();
+            const m = document.getElementById('bgMusic');
+            m.play().then(() => document.getElementById('musicBtn').innerText = '⏸ Pause').catch(() => {});
+        } else {
+            const box = document.getElementById('lockBox');
+            box.classList.add('shake');
+            setTimeout(() => { box.classList.remove('shake'); clearPin(); }, 400);
+        }
+    }
+
+    // JAM REALTIME DI TOP BAR
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('clockText').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }, 1000);
+
+    // 2. BUKA / TUTUP WINDOW APLIKASI
+    function openApp(id) {
+        document.querySelectorAll('.window-modal').forEach(w => w.classList.remove('open'));
+        document.getElementById(id).classList.add('open');
+    }
+    function closeApp(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // 3. DATA 13 FOTO (poto1.jpeg - poto13.jpeg)
+    const photos = [
+        { src: "poto2.jpeg", cap: "Foto #1: Awal cerita favoritku ✨" },
+        { src: "poto1.jpeg", cap: "Foto #2: Suara yang selalu bikin kangen 🥰" },
+        { src: "poto3.jpeg", cap: "Foto #3: Momen seru yang nggak terlupakan" },
+        { src: "poto4.jpeg", cap: "Foto #4: Dari Batam dengan penuh rindu 🇮🇩" },
+        { src: "poto5.jpeg", cap: "Foto #5: Menuju Selangor penuh cinta 🇲🇾" },
+        { src: "poto6.jpeg", cap: "Foto #6: Maaf ya ngambek teruss" },
+        { src: "poto7.jpeg", cap: "Foto #7: Selalu gemas tiap hari!" },
+        { src: "poto8.jpeg", cap: "Foto #8: Simpan baik-baik di memori" },
+        { src: "poto9.jpeg", cap: "Foto #9: My safe place ❤️" },
+        { src: "poto10.jpeg", cap: "Foto #10: Ketawa bareng terus ya" },
+        { src: "poto11.jpeg", cap: "Foto #11: Nggak pernah bosen ngelihatnya" },
+        { src: "poto12.jpeg", cap: "Foto #12: Menuju petualangan baru" },
+        { src: "poto13.jpeg", cap: "Foto #13: Happy Birthday KHAIIIKUUU! 🎂" }
+    ];
+    let currentIdx = 0;
+
+    // Render Thumbnail 13 Foto
+    const thumbStrip = document.getElementById('thumbStrip');
+    photos.forEach((p, idx) => {
+        const img = document.createElement('img');
+        img.src = p.src;
+        if (idx === 0) img.classList.add('active');
+        img.onclick = () => selectPhoto(idx);
+        thumbStrip.appendChild(img);
+    });
+
+    function selectPhoto(idx) {
+        currentIdx = idx;
+        document.getElementById('currentPhotoImg').src = photos[idx].src;
+        document.getElementById('currentPhotoCap').innerText = photos[idx].cap;
+        document.getElementById('photoCounter').innerText = `${idx + 1} / 13`;
+        document.querySelectorAll('#thumbStrip img').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+    function nextPhoto() { selectPhoto((currentIdx + 1) % photos.length); }
+    function prevPhoto() { selectPhoto((currentIdx - 1 + photos.length) % photos.length); }
+
+    // 4. LOVE METER SELANGOR - BATAM
+    let loveVal = 40;
+    function boostLove() {
+        loveVal = Math.min(100, loveVal + 15);
+        document.getElementById('loveFill').style.width = loveVal + '%';
+        document.getElementById('lovePercent').innerText = loveVal + '%';
+        spawnFloatingEmoji('🤗');
+        if (loveVal === 100) {
+            document.getElementById('lovePercent').innerText = '100% FULL RINDU! ❤️';
+            launchConfetti();
+        }
+    }
+
+    // 5. BUKA PESAN SURAT
+    function toggleMail(el) {
+        const content = el.querySelector('.mail-content');
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // 6. MINI GAME: TANGKAP HATI & GACHA
+    const arena = document.getElementById('catchArena');
+    const basket = document.getElementById('basket');
+    let gameLoop, timerLoop, score = 0, time = 15, activeGame = false;
+
+    function moveBasket(clientX) {
+        const rect = arena.getBoundingClientRect();
+        let x = Math.max(20, Math.min(rect.width - 20, clientX - rect.left));
+        basket.style.left = x + 'px';
+    }
+    arena.addEventListener('mousemove', e => moveBasket(e.clientX));
+    arena.addEventListener('touchmove', e => { if (e.touches[0]) moveBasket(e.touches[0].clientX); }, { passive: true });
+
+    function startCatch() {
+        if (activeGame) return;
+        activeGame = true; score = 0; time = 15;
+        document.getElementById('scoreVal').innerText = score;
+        document.getElementById('timeVal').innerText = time;
+        document.getElementById('startBtn').innerText = 'Mainkan...';
+
+        gameLoop = setInterval(() => {
+            const el = document.createElement('div');
+            el.className = 'falling';
+            el.innerText = ['❤️', '💖', '🍓', '⭐'][Math.floor(Math.random() * 4)];
+            el.style.left = Math.random() * (arena.clientWidth - 30) + 'px';
+            arena.appendChild(el);
+            let y = -25;
+            const drop = setInterval(() => {
+                if (!activeGame) { clearInterval(drop); el.remove(); return; }
+                y += 4; el.style.top = y + 'px';
+                const b = basket.getBoundingClientRect(), f = el.getBoundingClientRect();
+                if (f.bottom >= b.top && f.left < b.right && f.right > b.left) {
+                    score += 10; document.getElementById('scoreVal').innerText = score;
+                    clearInterval(drop); el.remove();
+                } else if (y > arena.clientHeight) { clearInterval(drop); el.remove(); }
+            }, 20);
+        }, 550);
+
+        timerLoop = setInterval(() => {
+            time--; document.getElementById('timeVal').innerText = time;
+            if (time <= 0) {
+                clearInterval(gameLoop); clearInterval(timerLoop); activeGame = false;
+                document.getElementById('startBtn').innerText = `Skor Akhir: ${score}! Main Lagi`;
+                launchConfetti();
+            }
+        }, 1000);
+    }
+
+    const vouchers = [
+        "🎟️ Voucher Bebas Minta Hadiah!",
+        "🎟️ Voucher Main VD sama akuww",
+        "🎟️ Voucher 10 Robux",
+        
+    ];
+    function spinGacha() {
+        const res = document.getElementById('gachaText');
+        res.innerText = "Mengacak hadiah...";
+        setTimeout(() => {
+            res.innerText = vouchers[Math.floor(Math.random() * vouchers.length)];
+            launchConfetti();
+        }, 500);
+    }
+
+    // 7. TIUP LILIN & FLOATING EMOJI
+    function blowCake() {
+        document.getElementById('flameIcon').style.display = 'none';
+        document.getElementById('wishDone').style.display = 'block';
+        document.getElementById('cakeHint').innerText = 'Lilin sudah ditiup!';
+        launchConfetti();
+    }
+
+    function spawnFloatingEmoji(emoji) {
+        const el = document.createElement('div');
+        el.innerText = emoji;
+        el.style.position = 'fixed';
+        el.style.left = (20 + Math.random() * 60) + '%';
+        el.style.bottom = '60px';
+        el.style.fontSize = '32px';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '1600';
+        el.style.transition = 'all 1.2s ease-out';
+        document.body.appendChild(el);
+        setTimeout(() => { el.style.bottom = '65%'; el.style.opacity = '0'; }, 30);
+        setTimeout(() => el.remove(), 1250);
+    }
+
+    function toggleMusic() {
+        const m = document.getElementById('bgMusic');
+        const b = document.getElementById('musicBtn');
+        if (m.paused) { m.play(); b.innerText = '⏸ Pause'; }
+        else { m.pause(); b.innerText = '🎵 Play Lagu'; }
+    }
+
+    function launchConfetti() {
+        const c = document.getElementById('confettiCanvas'), ctx = c.getContext('2d');
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const cols = ['#f8dce0', '#dce8f5', '#fdf0c9', '#e6dff5', '#e06d83'];
+        const p = Array.from({ length: 80 }, () => ({
+            x: Math.random() * c.width, y: -20, s: Math.random() * 8 + 4,
+            col: cols[Math.floor(Math.random() * cols.length)], v: Math.random() * 4 + 2
+        }));
+        let f = 0;
+        function anim() {
+            ctx.clearRect(0, 0, c.width, c.height);
+            p.forEach(i => { i.y += i.v; ctx.fillStyle = i.col; ctx.fillRect(i.x, i.y, i.s, i.s); });
+            if (++f < 150) requestAnimationFrame(anim); else ctx.clearRect(0, 0, c.width, c.height);
+        }
+        anim();
+    }
+</script>
+
+</body>
+</html>

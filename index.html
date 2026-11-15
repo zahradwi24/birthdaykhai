@@ -324,6 +324,7 @@
             transition: 0.2s;
         }
         .btn-pill:hover { background: var(--rose); }
+        .btn-pill:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .thumb-strip {
             display: flex;
@@ -458,7 +459,8 @@
             padding: 10px 20px;
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
             border-top: 1px solid rgba(0,0,0,0.06);
             z-index: 50;
         }
@@ -570,6 +572,14 @@
             <span class="app-label">Tiup Lilin</span>
         </div>
 
+        <div class="app-icon" onclick="openCameraApp()">
+            <div class="icon-box" style="background: #ffe3f1;">
+                🤳
+                <span class="notif-badge">1</span>
+            </div>
+            <span class="app-label">Kirim PAP</span>
+        </div>
+
         <div class="app-icon" onclick="spawnFloatingEmoji('❤️')">
             <div class="icon-box" style="background: #ffe3e8;">
                 💖
@@ -608,6 +618,7 @@
 <!-- BOTTOM DOCK -->
 <div class="bottom-dock">
     <button class="dock-btn" onclick="openApp('appGallery')">📸 Galeri (13)</button>
+    <button class="dock-btn" onclick="openCameraApp()">🤳 Kirim PAP</button>
     <button class="dock-btn" onclick="openApp('appGames')">🎮 Main Game</button>
     <button class="dock-btn" onclick="toggleMusic()" id="musicBtn">🎵 Play Lagu</button>
 </div>
@@ -621,7 +632,7 @@
     <div class="win-body photo-stage">
         <div class="flip-card" onclick="nextPhoto()">
             <img id="currentPhotoImg" src="poto2.jpeg" alt="Foto">
-            <div class="photo-caption" id="currentPhotoCap">Chapter 1: Awal cerita favoritku ✨ ✨</div>
+            <div class="photo-caption" id="currentPhotoCap">Foto #1: Awal cerita favoritku ✨</div>
         </div>
         <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">Klik foto atau tombol di bawah untuk ganti foto</p>
 
@@ -724,7 +735,7 @@
 
         <!-- Game 2: Gacha Voucher -->
         <div class="gacha-box">
-            <strong>🎁 2. Gacha Voucher Voucher Hadiah!</strong>
+            <strong>🎁 2. Gacha Voucher Hadiah!</strong>
             <p style="font-size: 12px; color: var(--muted);">Klik tombol acak buat dapetin hadiah kencan</p>
             <div class="gacha-result" id="gachaText">❓ Klik tombol di bawah!</div>
             <button class="btn-pill" style="background: var(--rose);" onclick="spinGacha()">🎲 Putar Gacha Sekarang</button>
@@ -750,8 +761,35 @@
     </div>
 </div>
 
+<!-- ================= WINDOW 6: KIRIM PAP KE DISCORD ================= -->
+<div class="window-modal" id="appPap">
+    <div class="win-header" style="background: #ffe3f1;">
+        <span>🤳 Kirim PAP Bukti Buka Web!</span>
+        <button class="win-close" onclick="closeCameraApp()">✕</button>
+    </div>
+    <div class="win-body" style="text-align: center;">
+        <p style="font-size: 13.5px; margin-bottom: 12px; color: var(--muted);">
+            Senyum dulu dong! Ambil foto sebagai bukti kamu udah buka web ini 🥰
+        </p>
+        
+        <div style="position: relative; border-radius: 18px; overflow: hidden; background: #000; max-width: 320px; margin: 0 auto; border: 3px solid var(--pastel-pink);">
+            <video id="papVideo" autoplay playsinline style="width: 100%; display: block; transform: scaleX(-1);"></video>
+            <img id="papPreview" style="width: 100%; display: none;" alt="Preview PAP">
+            <canvas id="papCanvas" style="display: none;"></canvas>
+        </div>
+
+        <p id="papStatus" style="font-size: 13px; font-weight: 700; color: var(--rose); margin-top: 10px;"></p>
+
+        <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: center;">
+            <button class="btn-pill" id="btnSnap" style="background: var(--rose);" onclick="takePap()">📸 Jepret Foto</button>
+            <button class="btn-pill" id="btnRetake" style="display: none; background: var(--muted);" onclick="retakePap()">🔄 Ulang</button>
+            <button class="btn-pill" id="btnSendPap" style="display: none; background: #28a745;" onclick="sendPapToDiscord()">🚀 Kirim ke Aku</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // 1. LOCK SCREEN PIN (Ubah PIN di sini)
+    // 1. LOCK SCREEN PIN
     const PIN = "161106";
     let inputPin = "";
 
@@ -788,6 +826,10 @@
 
     // 2. BUKA / TUTUP WINDOW APLIKASI
     function openApp(id) {
+        if (cameraStream && id !== 'appPap') {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
         document.querySelectorAll('.window-modal').forEach(w => w.classList.remove('open'));
         document.getElementById(id).classList.add('open');
     }
@@ -903,8 +945,7 @@
     const vouchers = [
         "🎟️ Voucher Bebas Minta Hadiah!",
         "🎟️ Voucher Main VD sama akuww",
-        "🎟️ Voucher 10 Robux",
-        
+        "🎟️ Voucher 10 Robux"
     ];
     function spinGacha() {
         const res = document.getElementById('gachaText');
@@ -960,6 +1001,105 @@
             if (++f < 150) requestAnimationFrame(anim); else ctx.clearRect(0, 0, c.width, c.height);
         }
         anim();
+    }
+
+    // 8. FITUR KAMERA PAP -> KIRIM KE DISCORD
+    const DISCORD_WEBHOOK_URL = "https://discord.gg/Z5DVwbSjU";
+    let cameraStream = null;
+    let photoBlob = null;
+
+    async function openCameraApp() {
+        openApp('appPap');
+        document.getElementById('papStatus').innerText = "Membuka kamera...";
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+            const video = document.getElementById('papVideo');
+            video.srcObject = cameraStream;
+            video.style.display = 'block';
+            document.getElementById('papPreview').style.display = 'none';
+            document.getElementById('btnSnap').style.display = 'inline-block';
+            document.getElementById('btnRetake').style.display = 'none';
+            document.getElementById('btnSendPap').style.display = 'none';
+            document.getElementById('papStatus').innerText = "";
+        } catch (err) {
+            document.getElementById('papStatus').innerText = "Yah, izin kamera ditolak! Izinkan kamera di browser ya.";
+        }
+    }
+
+    function closeCameraApp() {
+        closeApp('appPap');
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    function takePap() {
+        const video = document.getElementById('papVideo');
+        const canvas = document.getElementById('papCanvas');
+        const preview = document.getElementById('papPreview');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        // Balik gambar agar tidak mirror saat tersimpan
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+            photoBlob = blob;
+            preview.src = URL.createObjectURL(blob);
+            video.style.display = 'none';
+            preview.style.display = 'block';
+
+            document.getElementById('btnSnap').style.display = 'none';
+            document.getElementById('btnRetake').style.display = 'inline-block';
+            document.getElementById('btnSendPap').style.display = 'inline-block';
+        }, 'image/jpeg', 0.85);
+    }
+
+    function retakePap() {
+        document.getElementById('papVideo').style.display = 'block';
+        document.getElementById('papPreview').style.display = 'none';
+        document.getElementById('btnSnap').style.display = 'inline-block';
+        document.getElementById('btnRetake').style.display = 'none';
+        document.getElementById('btnSendPap').style.display = 'none';
+        document.getElementById('papStatus').innerText = "";
+    }
+
+    async function sendPapToDiscord() {
+        if (!photoBlob) return;
+        const status = document.getElementById('papStatus');
+        const btnSend = document.getElementById('btnSendPap');
+        status.innerText = "Sedang mengirim PAP...";
+        btnSend.disabled = true;
+
+        const formData = new FormData();
+        formData.append("file", photoBlob, "pap_khai.jpg");
+        formData.append("payload_json", JSON.stringify({
+            content: "📸 **Yeay! Khai baru saja buka web ulang tahunnya dan kirim PAP ini!** ✨"
+        }));
+
+        try {
+            const response = await fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                body: formData
+            });
+            
+            if (response.ok) {
+                status.innerText = "Terkirim! Makasih udah PAP 🥰🎉";
+                launchConfetti();
+                setTimeout(() => closeCameraApp(), 2000);
+            } else {
+                status.innerText = "Gagal mengirim. Cek lagi link Webhook Discord-nya.";
+            }
+        } catch (error) {
+            status.innerText = "Terjadi kesalahan jaringan.";
+        } finally {
+            btnSend.disabled = false;
+        }
     }
 </script>
 
